@@ -1,3 +1,4 @@
+
 <!doctype html>
 <html lang="pt-BR">
 <head>
@@ -16,7 +17,7 @@ header{background:linear-gradient(135deg,#245b4a,#347861);color:#fff;padding:26p
 h1{font-size:27px;line-height:1.1;margin:8px 0}
 header p{margin:8px 0 0;font-size:14px;opacity:.9}
 main{max-width:700px;margin:0 auto;padding:16px}
-.stats{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:-2px}
+.stats{display:grid;grid-template-columns:repeat(1,minmax(0,1fr));gap:10px;margin-top:-2px}
 .stat{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px}
 .stat small{display:block;color:var(--muted);font-size:12px;margin-bottom:7px}
 .stat strong{font-size:21px;letter-spacing:-.5px}
@@ -49,7 +50,7 @@ textarea{resize:vertical;min-height:70px}
 .actions{display:flex;flex-wrap:wrap;gap:8px;margin:16px 0 8px}
 footer{text-align:center;color:var(--muted);font-size:12px;padding:20px 8px 28px}
 .toast{position:fixed;bottom:calc(18px + env(safe-area-inset-bottom));left:50%;transform:translateX(-50%);background:#17231d;color:#fff;padding:11px 16px;border-radius:12px;font-size:13px;display:none;max-width:90%;z-index:5}
-@media(min-width:560px){.stats{grid-template-columns:repeat(3,minmax(0,1fr))}.item{padding:15px}.fields{grid-template-columns:1fr 1fr 1fr}}
+@media(min-width:560px){.stats{grid-template-columns:repeat(2,minmax(0,1fr))}.item{padding:15px}.fields{grid-template-columns:1fr 1fr 1fr}}
 </style>
 </head>
 <body>
@@ -59,7 +60,6 @@ footer{text-align:center;color:var(--muted);font-size:12px;padding:20px 8px 28px
 <main>
   <section class="stats">
     <div class="stat"><small>Total previsto</small><strong id="total">R$ 0,00</strong><div class="progress-wrap"><div class="progress" id="progress"></div></div></div>
-    <div class="stat"><small>Itens na lista</small><strong id="count">0 de 8</strong></div>
     <div class="stat"><small>Orçamento disponível</small><strong id="balance">R$ 0,00</strong></div>
   </section>
 
@@ -142,12 +142,12 @@ function renderStats(){
  
  const activeItems=state.items.filter(x=>!x.bought);
  const total=activeItems.reduce((s,x)=>s+itemTotal(x),0);
+ const boughtCount=state.items.filter(x=>x.bought).length;
  
  document.getElementById("total").textContent=fmt(total);
- document.getElementById("count").textContent=`${activeItems.length} de ${state.items.length}`;
  document.getElementById("spent").textContent=fmt(total);
  document.getElementById("balance").textContent=fmt((Number(state.budget)||0)-total);
- document.getElementById("progress").style.width=(state.items.length?(activeItems.length/state.items.length)*100:0)+"%";
+ document.getElementById("progress").style.width=(state.items.length?((state.items.length - boughtCount)/state.items.length)*100:0)+"%";
 }
 document.getElementById("add").addEventListener("click",()=>{state.items.push({name:"Novo ingrediente",qty:1,price:0,bought:false,note:""});save();render();toast("Item adicionado")});
 document.getElementById("budget").addEventListener("input",e=>{state.budget=Number(e.target.value)||0;save()});
@@ -200,3 +200,4 @@ render();
 </script>
 </body>
 </html>
+
