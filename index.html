@@ -1,8 +1,6 @@
 <!doctype html>
 <html lang="pt-BR">
-<head>  
-<link rel="apple-touch-icon" href="apple-touch-icon.PNG">
-<meta name="apple-mobile-web-app-capable" content="yes">
+<head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#245b4a">
@@ -30,6 +28,8 @@ button{font:inherit;cursor:pointer}
 .secondary{background:#e6eee9;color:var(--green);border:0;border-radius:10px;padding:9px 11px;font-weight:650}
 .item{background:var(--card);border:1px solid var(--line);border-radius:15px;padding:13px;margin-bottom:9px;display:grid;grid-template-columns:28px minmax(0,1fr);gap:10px}
 .item.done{opacity:.72}
+/* Adicionado para riscar o texto do item quando marcado */
+.item.done .name-input {text-decoration: line-through; color: var(--muted);}
 .check{width:23px;height:23px;accent-color:var(--green);margin-top:3px}
 .fields{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:9px;margin-top:9px}
 label{display:block;font-size:11px;color:var(--muted);margin-bottom:4px}
@@ -53,9 +53,7 @@ footer{text-align:center;color:var(--muted);font-size:12px;padding:20px 8px 28px
 </head>
 <body>
 <header>
-  
   <h1>Minha lista de compras</h1>
-  
 </header>
 <main>
   <section class="stats">
@@ -125,12 +123,12 @@ function render(){
    </div>`;
   const [check,name,del,qty,price]=[el.querySelector(".check"),el.querySelector(".name-input"),el.querySelector(".delete"),el.querySelector(".qty"),el.querySelector(".price-input")];
   name.value=it.name;qty.value=it.qty;price.value=it.price;
-  check.addEventListener("change",()=>{it.bought=check.checked;el.classList.toggle("done",it.bought);save();renderStats();el.querySelector(".item-status").textContent=it.bought?"Comprado":"Pendente"});
+  check.addEventListener("change",()=>{it.bought=check.checked;el.classList.toggle("done",it.bought);save();renderStats();el.querySelector(".item-status").textContent=it.bought?"Comprado/Ignorado":"Pendente"});
   name.addEventListener("input",()=>{it.name=name.value;save()});
   qty.addEventListener("input",()=>{it.qty=Number(qty.value)||0;save();renderStats();el.querySelector(".price").textContent=fmt((Number(it.qty)||0)*(Number(it.price)||0))});
   price.addEventListener("input",()=>{it.price=Number(price.value)||0;save();renderStats();el.querySelector(".price").textContent=fmt((Number(it.qty)||0)*(Number(it.price)||0))});
   del.addEventListener("click",()=>{if(confirm("Excluir "+(it.name||"este item")+" da lista?")){state.items.splice(i,1);save();render()}});
-  el.querySelector(".item-status").textContent=it.bought?"Comprado":"Pendente";
+  el.querySelector(".item-status").textContent=it.bought?"Comprado/Ignorado":"Pendente";
   el.querySelector(".price").textContent=fmt((Number(it.qty)||0)*(Number(it.price)||0));
   root.appendChild(el);
  });
@@ -140,7 +138,10 @@ function render(){
 }
 function renderStats(){
  const itemTotal=x=>(Number(x.qty)||0)*(Number(x.price)||0);
- const total=state.items.reduce((s,x)=>s+itemTotal(x),0);
+ 
+ // Modificado aqui: soma no total previsto apenas os itens que NÃO estão marcados (!x.bought)
+ const total=state.items.filter(x=>!x.bought).reduce((s,x)=>s+itemTotal(x),0);
+ 
  const bought=state.items.filter(x=>x.bought);
  const spent=bought.reduce((s,x)=>s+itemTotal(x),0);
  document.getElementById("total").textContent=fmt(total);
@@ -160,7 +161,7 @@ document.getElementById("saveList").addEventListener("click",()=>{
   const defaultName="Lista de compras";
   const name=prompt("Dê um nome para esta lista (ex.: Ação social de dezembro):",defaultName);
   if(name===null)return;
-  const cleanName=name.trim();
+  const cleanName=name.name?name.name.trim():name.trim();
   if(!cleanName){toast("Digite um nome para salvar a lista");return}
   const lists=getSavedLists();
   const existing=lists.findIndex(x=>x.name.toLowerCase()===cleanName.toLowerCase());
@@ -193,7 +194,7 @@ document.getElementById("export").addEventListener("click",()=>{
  const lines=["CHECKLIST — AÇÃO SOCIAL (50 pessoas)",""];
  const itemTotal=x=>(Number(x.qty)||0)*(Number(x.price)||0);
  state.items.forEach(it=>lines.push(`${it.bought?"[x]":"[ ]"} ${it.name} | Quantidade: ${it.qty} | Valor unitário: ${fmt(it.price)} | Total: ${fmt(itemTotal(it))}`));
- lines.push("",`Total previsto: ${fmt(state.items.reduce((s,x)=>s+itemTotal(x),0))}`,`Orçamento: ${fmt(state.budget)}`,`Total comprado: ${fmt(state.items.filter(x=>x.bought).reduce((s,x)=>s+itemTotal(x),0))}`,"","Observações:",state.notes||"—");
+ lines.push("",`Total previsto: ${fmt(state.items.filter(x=>!x.bought).reduce((s,x)=>s+itemTotal(x),0))}`,`Orçamento: ${fmt(state.budget)}`,"","Observações:",state.notes||"—");
  const blob=new Blob([lines.join("\n")],{type:"text/plain;charset=utf-8"});const url=URL.createObjectURL(blob);const a=document.createElement("a");a.href=url;a.download="checklist-acao-social.txt";a.click();URL.revokeObjectURL(url);toast("Lista exportada");
 });
 render();
