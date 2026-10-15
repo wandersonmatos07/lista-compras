@@ -49,9 +49,6 @@ footer{text-align:center;color:var(--muted);font-size:12px;padding:20px 8px 28px
 @media(min-width:560px){.stats{grid-template-columns:repeat(3,minmax(0,1fr))}.item{padding:15px}.fields{grid-template-columns:1fr 1fr 1fr}}
 </style>
 </head>
-  <link rel="apple-touch-icon" href="apple-touch-icon.png">
-
-<meta name="apple-mobile-web-app-capable" content="yes">
 <body>
 <header>
   
@@ -66,7 +63,7 @@ footer{text-align:center;color:var(--muted);font-size:12px;padding:20px 8px 28px
   </section>
 
   <div class="section-head">
-    <div><h2>Lista de compras</h2><div class="small-muted">Edite nome, quantidade e preço</div></div>
+    <div><h2>Lista de compras</h2><div class="small-muted">Edite nome, quantidade e valor por unidade</div></div>
     <button class="primary" id="add">+ Adicionar</button>
   </div>
   <div id="items"></div>
@@ -84,6 +81,8 @@ footer{text-align:center;color:var(--muted);font-size:12px;padding:20px 8px 28px
   </section>
 
   <div class="actions">
+    <button class="primary" id="saveList">Salvar lista para reutilizar</button>
+    <button class="secondary" id="loadList">Usar lista salva</button>
     <button class="secondary" id="export">Exportar lista</button>
     <button class="secondary" id="reset">Restaurar lista inicial</button>
   </div>
@@ -92,16 +91,17 @@ footer{text-align:center;color:var(--muted);font-size:12px;padding:20px 8px 28px
 <div class="toast" id="toast"></div>
 <script>
 const initialItems=[
- {name:"Peito de frango",qty:"8 kg",price:180,range:"R$ 160–200",bought:false,note:""},
- {name:"Creme de leite",qty:"15 caixas",price:52.5,range:"R$ 45–60",bought:false,note:""},
- {name:"Molho de tomate",qty:"2 kg",price:20,range:"R$ 15–25",bought:false,note:""},
- {name:"Arroz",qty:"4 kg",price:30,range:"R$ 25–35",bought:false,note:""},
- {name:"Batata palha",qty:"1,5 kg",price:40,range:"R$ 30–50",bought:false,note:""},
- {name:"Cebola e alho",qty:"1,5 kg no total",price:20,range:"R$ 15–25",bought:false,note:""},
- {name:"Ketchup e mostarda",qty:"Para a receita",price:30,range:"R$ 25–35",bought:false,note:""},
- {name:"Óleo, sal e temperos",qty:"Para a receita",price:25,range:"R$ 20–30",bought:false,note:""}
+ {name:"Peito de frango",qty:8,price:22.5,bought:false,note:""},
+ {name:"Creme de leite",qty:15,price:3.5,bought:false,note:""},
+ {name:"Molho de tomate",qty:2,price:10,bought:false,note:""},
+ {name:"Arroz",qty:4,price:7.5,bought:false,note:""},
+ {name:"Batata palha",qty:1.5,price:26.67,bought:false,note:""},
+ {name:"Cebola e alho",qty:1.5,price:13.33,bought:false,note:""},
+ {name:"Ketchup e mostarda",qty:1,price:30,bought:false,note:""},
+ {name:"Óleo, sal e temperos",qty:1,price:25,bought:false,note:""}
 ];
 const key="acaoSocialStrogonoffV1";
+const savedListsKey="acaoSocialSavedListsV1";
 let state;
 try{state=JSON.parse(localStorage.getItem(key))||null}catch(e){state=null}
 if(!state)state={items:initialItems,budget:450,notes:""};
@@ -116,22 +116,20 @@ function render(){
    <div>
     <div class="item-top"><input class="name-input" aria-label="Ingrediente" value=""><button class="delete" aria-label="Excluir item" title="Excluir item">×</button></div>
     <div class="fields">
-     <div><label>Quantidade</label><input class="qty" value="" aria-label="Quantidade"></div>
-     <div><label>Preço previsto (R$)</label><input class="price-input" type="number" min="0" step=".01" value="" aria-label="Preço previsto"></div>
-     <div><label>Faixa de preço (opcional)</label><input class="range" value="" aria-label="Faixa de preço"></div>
+     <div><label>Quantidade</label><input class="qty" type="number" min="0" step="any" value="" aria-label="Quantidade"></div>
+     <div><label>Valor (R$)</label><input class="price-input" type="number" min="0" step=".01" value="" aria-label="Valor por unidade"></div>
     </div>
     <div class="item-bottom"><span class="small-muted item-status"></span><span class="price"></span></div>
    </div>`;
-  const [check,name,del,qty,price,range]=[el.querySelector(".check"),el.querySelector(".name-input"),el.querySelector(".delete"),el.querySelector(".qty"),el.querySelector(".price-input"),el.querySelector(".range")];
-  name.value=it.name;qty.value=it.qty;price.value=it.price;range.value=it.range||"";
+  const [check,name,del,qty,price]=[el.querySelector(".check"),el.querySelector(".name-input"),el.querySelector(".delete"),el.querySelector(".qty"),el.querySelector(".price-input")];
+  name.value=it.name;qty.value=it.qty;price.value=it.price;
   check.addEventListener("change",()=>{it.bought=check.checked;el.classList.toggle("done",it.bought);save();renderStats();el.querySelector(".item-status").textContent=it.bought?"Comprado":"Pendente"});
   name.addEventListener("input",()=>{it.name=name.value;save()});
-  qty.addEventListener("input",()=>{it.qty=qty.value;save()});
-  price.addEventListener("input",()=>{it.price=Number(price.value)||0;save();renderStats();el.querySelector(".price").textContent=fmt(it.price)});
-  range.addEventListener("input",()=>{it.range=range.value;save()});
+  qty.addEventListener("input",()=>{it.qty=Number(qty.value)||0;save();renderStats();el.querySelector(".price").textContent=fmt((Number(it.qty)||0)*(Number(it.price)||0))});
+  price.addEventListener("input",()=>{it.price=Number(price.value)||0;save();renderStats();el.querySelector(".price").textContent=fmt((Number(it.qty)||0)*(Number(it.price)||0))});
   del.addEventListener("click",()=>{if(confirm("Excluir "+(it.name||"este item")+" da lista?")){state.items.splice(i,1);save();render()}});
   el.querySelector(".item-status").textContent=it.bought?"Comprado":"Pendente";
-  el.querySelector(".price").textContent=fmt(it.price);
+  el.querySelector(".price").textContent=fmt((Number(it.qty)||0)*(Number(it.price)||0));
   root.appendChild(el);
  });
  document.getElementById("budget").value=state.budget;
@@ -139,23 +137,61 @@ function render(){
  renderStats();
 }
 function renderStats(){
- const total=state.items.reduce((s,x)=>s+(Number(x.price)||0),0);
+ const itemTotal=x=>(Number(x.qty)||0)*(Number(x.price)||0);
+ const total=state.items.reduce((s,x)=>s+itemTotal(x),0);
  const bought=state.items.filter(x=>x.bought);
- const spent=bought.reduce((s,x)=>s+(Number(x.price)||0),0);
+ const spent=bought.reduce((s,x)=>s+itemTotal(x),0);
  document.getElementById("total").textContent=fmt(total);
  document.getElementById("count").textContent=`${bought.length} de ${state.items.length}`;
  document.getElementById("spent").textContent=fmt(spent);
  document.getElementById("balance").textContent=fmt((Number(state.budget)||0)-total);
  document.getElementById("progress").style.width=(state.items.length?bought.length/state.items.length*100:0)+"%";
 }
-document.getElementById("add").addEventListener("click",()=>{state.items.push({name:"Novo ingrediente",qty:"",price:0,range:"",bought:false,note:""});save();render();toast("Item adicionado")});
+document.getElementById("add").addEventListener("click",()=>{state.items.push({name:"Novo ingrediente",qty:1,price:0,bought:false,note:""});save();render();toast("Item adicionado")});
 document.getElementById("budget").addEventListener("input",e=>{state.budget=Number(e.target.value)||0;save()});
 document.getElementById("notes").addEventListener("input",e=>{state.notes=e.target.value;save()});
+
+function getSavedLists(){
+  try{return JSON.parse(localStorage.getItem(savedListsKey))||[]}catch(e){return []}
+}
+document.getElementById("saveList").addEventListener("click",()=>{
+  const defaultName="Lista de compras";
+  const name=prompt("Dê um nome para esta lista (ex.: Ação social de dezembro):",defaultName);
+  if(name===null)return;
+  const cleanName=name.trim();
+  if(!cleanName){toast("Digite um nome para salvar a lista");return}
+  const lists=getSavedLists();
+  const existing=lists.findIndex(x=>x.name.toLowerCase()===cleanName.toLowerCase());
+  const snapshot={name:cleanName,savedAt:new Date().toISOString(),items:JSON.parse(JSON.stringify(state.items)),budget:Number(state.budget)||0,notes:state.notes||""};
+  if(existing>=0){
+    if(!confirm("Já existe uma lista com esse nome. Deseja substituir a versão salva?"))return;
+    lists[existing]=snapshot;
+  }else{
+    lists.push(snapshot);
+  }
+  try{localStorage.setItem(savedListsKey,JSON.stringify(lists));toast("Lista salva para reutilizar!")}
+  catch(e){toast("Não foi possível salvar. Verifique o espaço disponível no navegador.")}
+});
+document.getElementById("loadList").addEventListener("click",()=>{
+  const lists=getSavedLists();
+  if(!lists.length){toast("Você ainda não tem listas salvas");return}
+  const menu=lists.map((x,i)=>`${i+1}. ${x.name}`).join("\n");
+  const answer=prompt("Digite o número da lista que deseja reutilizar:\n\n"+menu);
+  if(answer===null)return;
+  const index=Number(answer)-1;
+  if(!Number.isInteger(index)||index<0||index>=lists.length){toast("Número de lista inválido");return}
+  if(!confirm("Carregar esta lista substituirá a lista atual na tela. Deseja continuar?"))return;
+  const chosen=lists[index];
+  state={items:JSON.parse(JSON.stringify(chosen.items||[])),budget:Number(chosen.budget)||0,notes:chosen.notes||""};
+  save();render();toast("Lista reutilizada com sucesso!");
+});
+
 document.getElementById("reset").addEventListener("click",()=>{if(confirm("Restaurar a lista original? Suas alterações atuais serão substituídas.")){state={items:JSON.parse(JSON.stringify(initialItems)),budget:450,notes:""};save();render();toast("Lista restaurada")}});
 document.getElementById("export").addEventListener("click",()=>{
  const lines=["CHECKLIST — AÇÃO SOCIAL (50 pessoas)",""];
- state.items.forEach(it=>lines.push(`${it.bought?"[x]":"[ ]"} ${it.name} | ${it.qty} | ${fmt(it.price)} | ${it.range||""}`));
- lines.push("",`Total previsto: ${fmt(state.items.reduce((s,x)=>s+(Number(x.price)||0),0))}`,`Orçamento: ${fmt(state.budget)}`,`Total comprado: ${fmt(state.items.filter(x=>x.bought).reduce((s,x)=>s+(Number(x.price)||0),0))}`,"","Observações:",state.notes||"—");
+ const itemTotal=x=>(Number(x.qty)||0)*(Number(x.price)||0);
+ state.items.forEach(it=>lines.push(`${it.bought?"[x]":"[ ]"} ${it.name} | Quantidade: ${it.qty} | Valor unitário: ${fmt(it.price)} | Total: ${fmt(itemTotal(it))}`));
+ lines.push("",`Total previsto: ${fmt(state.items.reduce((s,x)=>s+itemTotal(x),0))}`,`Orçamento: ${fmt(state.budget)}`,`Total comprado: ${fmt(state.items.filter(x=>x.bought).reduce((s,x)=>s+itemTotal(x),0))}`,"","Observações:",state.notes||"—");
  const blob=new Blob([lines.join("\n")],{type:"text/plain;charset=utf-8"});const url=URL.createObjectURL(blob);const a=document.createElement("a");a.href=url;a.download="checklist-acao-social.txt";a.click();URL.revokeObjectURL(url);toast("Lista exportada");
 });
 render();
