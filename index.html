@@ -1,4 +1,5 @@
-
+Pronto! Substituí toda a lista de itens e categorias no código exatamente como você enviou, mantendo todas as seções separadas, sem as bolinhas laterais, e com a funcionalidade de riscar e recalcular o total quando você marcar a caixinha.
+Aqui está o código completo para você atualizar no seu arquivo index.html no GitHub:
 <!doctype html>
 <html lang="pt-BR">
 <head>
@@ -7,15 +8,13 @@
 <meta name="theme-color" content="#245b4a">
 <link rel="apple-touch-icon" href="apple-touch-icon.PNG">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<title>Minha Ação Social</title>
+<title>Minha Lista de Compras</title>
 <style>
-:root{--green:#245b4a;--green2:#347861;--bg:#f3f6f4;--card:#fff;--text:#17231d;--muted:#6d7972;--line:#e0e8e3;--orange:#fff2dc}
+:root{--green:#245b4a;--green2:#347861;--bg:#f3f6f4;--card:#fff;--text:#17231d;--muted:#6d7972;--line:#e0e8e3}
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;padding:env(safe-area-inset-top) 0 env(safe-area-inset-bottom)}
 header{background:linear-gradient(135deg,#245b4a,#347861);color:#fff;padding:26px 18px 22px;border-radius:0 0 24px 24px}
-.eyebrow{font-size:12px;letter-spacing:1.2px;text-transform:uppercase;opacity:.8;font-weight:700}
 h1{font-size:27px;line-height:1.1;margin:8px 0}
-header p{margin:8px 0 0;font-size:14px;opacity:.9}
 main{max-width:700px;margin:0 auto;padding:16px}
 .stats{display:grid;grid-template-columns:repeat(1,minmax(0,1fr));gap:10px;margin-top:-2px}
 .stat{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px}
@@ -25,6 +24,7 @@ main{max-width:700px;margin:0 auto;padding:16px}
 .progress{height:100%;background:var(--green2);width:0;transition:width .2s}
 .section-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:23px 2px 10px}
 h2{font-size:18px;margin:0}
+.category-title{font-size:16px;color:var(--green);margin:24px 0 10px;font-weight:700;border-bottom:2px solid var(--line);padding-bottom:4px}
 .small-muted{color:var(--muted);font-size:12px}
 button{font:inherit;cursor:pointer}
 .primary{background:var(--green);color:#fff;border:0;border-radius:12px;padding:11px 14px;font-weight:650}
@@ -55,7 +55,7 @@ footer{text-align:center;color:var(--muted);font-size:12px;padding:20px 8px 28px
 </head>
 <body>
 <header>
-  <h1>Minha lista de compras</h1>
+  <h1>Minha Lista de Compras</h1>
 </header>
 <main>
   <section class="stats">
@@ -77,7 +77,7 @@ footer{text-align:center;color:var(--muted);font-size:12px;padding:20px 8px 28px
 
   <div class="section-head"><h2>Observações</h2></div>
   <section class="note-box">
-    <label for="notes">Anote doações, quem vai comprar ou outras informações</label>
+    <label for="notes">Anote informações importantes sobre a compra</label>
     <textarea id="notes" placeholder="Ex.: mercado vai doar o arroz..."></textarea>
   </section>
 
@@ -92,26 +92,89 @@ footer{text-align:center;color:var(--muted);font-size:12px;padding:20px 8px 28px
 <div class="toast" id="toast"></div>
 <script>
 const initialItems=[
- {name:"Peito de frango",qty:8,price:22.5,bought:false,note:""},
- {name:"Creme de leite",qty:15,price:3.5,bought:false,note:""},
- {name:"Molho de tomate",qty:2,price:10,bought:false,note:""},
- {name:"Arroz",qty:4,price:7.5,bought:false,note:""},
- {name:"Batata palha",qty:1.5,price:26.67,bought:false,note:""},
- {name:"Cebola e alho",qty:1.5,price:13.33,bought:false,note:""},
- {name:"Ketchup e mostarda",qty:1,price:30,bought:false,note:""},
- {name:"Óleo, sal e temperos",qty:1,price:25,bought:false,note:""}
+ {category:"🍚 Mercearia",name:"Arroz",qty:1,price:0,bought:false,note:""},
+ {category:"🍚 Mercearia",name:"Feijão",qty:1,price:0,bought:false,note:""},
+ {category:"🍚 Mercearia",name:"Macarrão espaguete",qty:1,price:0,bought:false,note:""},
+ {category:"🍚 Mercearia",name:"Macarrão parafuso",qty:1,price:0,bought:false,note:""},
+ {category:"🍚 Mercearia",name:"Óleo de cozinha",qty:1,price:0,bought:false,note:""},
+ {category:"🍚 Mercearia",name:"Açúcar",qty:1,price:0,bought:false,note:""},
+ {category:"🍚 Mercearia",name:"Sal",qty:1,price:0,bought:false,note:""},
+ {category:"🍚 Mercearia",name:"Café",qty:1,price:0,bought:false,note:""},
+ {category:"🍚 Mercearia",name:"Farinha de trigo",qty:1,price:0,bought:false,note:""},
+ {category:"🍚 Mercearia",name:"Farinha de mandioca",qty:1,price:0,bought:false,note:""},
+ {category:"🍚 Mercearia",name:"Molho de tomate",qty:1,price:0,bought:false,note:""},
+ {category:"🍚 Mercearia",name:"Aveia",qty:1,price:0,bought:false,note:""},
+ {category:"🥩 Carnes e proteínas",name:"Frango",qty:1,price:0,bought:false,note:""},
+ {category:"🥩 Carnes e proteínas",name:"Carne bovina",qty:1,price:0,bought:false,note:""},
+ {category:"🥩 Carnes e proteínas",name:"Carne moída",qty:1,price:0,bought:false,note:""},
+ {category:"🥩 Carnes e proteínas",name:"Ovos",qty:1,price:0,bought:false,note:""},
+ {category:"🥩 Carnes e proteínas",name:"Peixe",qty:1,price:0,bought:false,note:""},
+ {category:"🥩 Carnes e proteínas",name:"Linguiça",qty:1,price:0,bought:false,note:""},
+ {category:"🥛 Geladeira e laticínios",name:"Leite",qty:1,price:0,bought:false,note:""},
+ {category:"🥛 Geladeira e laticínios",name:"Queijo",qty:1,price:0,bought:false,note:""},
+ {category:"🥛 Geladeira e laticínios",name:"Presunto",qty:1,price:0,bought:false,note:""},
+ {category:"🥛 Geladeira e laticínios",name:"Manteiga ou margarina",qty:1,price:0,bought:false,note:""},
+ {category:"🥛 Geladeira e laticínios",name:"Requeijão",qty:1,price:0,bought:false,note:""},
+ {category:"🥛 Geladeira e laticínios",name:"Iogurte",qty:1,price:0,bought:false,note:""},
+ {category:"🥕 Hortifruti",name:"Batata",qty:1,price:0,bought:false,note:""},
+ {category:"🥕 Hortifruti",name:"Cebola",qty:1,price:0,bought:false,note:""},
+ {category:"🥕 Hortifruti",name:"Alho",qty:1,price:0,bought:false,note:""},
+ {category:"🥕 Hortifruti",name:"Tomate",qty:1,price:0,bought:false,note:""},
+ {category:"🥕 Hortifruti",name:"Cenoura",qty:1,price:0,bought:false,note:""},
+ {category:"🥕 Hortifruti",name:"Alface",qty:1,price:0,bought:false,note:""},
+ {category:"🥕 Hortifruti",name:"Banana",qty:1,price:0,bought:false,note:""},
+ {category:"🥕 Hortifruti",name:"Maçã",qty:1,price:0,bought:false,note:""},
+ {category:"🥕 Hortifruti",name:"Laranja",qty:1,price:0,bought:false,note:""},
+ {category:"🥕 Hortifruti",name:"Limão",qty:1,price:0,bought:false,note:""},
+ {category:"🧹 Limpeza",name:"Detergente",qty:1,price:0,bought:false,note:""},
+ {category:"🧹 Limpeza",name:"Sabão em pó ou líquido",qty:1,price:0,bought:false,note:""},
+ {category:"🧹 Limpeza",name:"Amaciante",qty:1,price:0,bought:false,note:""},
+ {category:"🧹 Limpeza",name:"Água sanitária",qty:1,price:0,bought:false,note:""},
+ {category:"🧹 Limpeza",name:"Desinfetante",qty:1,price:0,bought:false,note:""},
+ {category:"🧹 Limpeza",name:"Esponja de louça",qty:1,price:0,bought:false,note:""},
+ {category:"🧹 Limpeza",name:"Sacos de lixo",qty:1,price:0,bought:false,note:""},
+ {category:"🧹 Limpeza",name:"Limpador multiuso",qty:1,price:0,bought:false,note:""},
+ {category:"🧴 Higiene pessoal",name:"Papel higiênico",qty:1,price:0,bought:false,note:""},
+ {category:"🧴 Higiene pessoal",name:"Creme dental",qty:1,price:0,bought:false,note:""},
+ {category:"🧴 Higiene pessoal",name:"Escova de dentes — opção 1",qty:1,price:0,bought:false,note:""},
+ {category:"🧴 Higiene pessoal",name:"Escova de dentes — opção 2",qty:1,price:0,bought:false,note:""},
+ {category:"🧴 Higiene pessoal",name:"Escova de dentes — opção 3",qty:1,price:0,bought:false,note:""},
+ {category:"🧴 Higiene pessoal",name:"Sabonete",qty:1,price:0,bought:false,note:""},
+ {category:"🧴 Higiene pessoal",name:"Shampoo",qty:1,price:0,bought:false,note:""},
+ {category:"🧴 Higiene pessoal",name:"Condicionador",qty:1,price:0,bought:false,note:""},
+ {category:"🥖 Padaria e lanches",name:"Pão",qty:1,price:0,bought:false,note:""},
+ {category:"🥖 Padaria e lanches",name:"Pão de forma",qty:1,price:0,bought:false,note:""},
+ {category:"🥖 Padaria e lanches",name:"Tapioca",qty:1,price:0,bought:false,note:""},
+ {category:"🥖 Padaria e lanches",name:"Queijo para lanche",qty:1,price:0,bought:false,note:""},
+ {category:"🥖 Padaria e lanches",name:"Biscoito — opção 1",qty:1,price:0,bought:false,note:""},
+ {category:"🥖 Padaria e lanches",name:"Biscoito — opção 2",qty:1,price:0,bought:false,note:""},
+ {category:"🥖 Padaria e lanches",name:"Biscoito — opção 3",qty:1,price:0,bought:false,note:""},
+ {category:"🥖 Padaria e lanches",name:"Biscoito — opção 4",qty:1,price:0,bought:false,note:""},
+ {category:"🥖 Padaria e lanches",name:"Biscoito — opção 5",qty:1,price:0,bought:false,note:""},
+ {category:"🥖 Padaria e lanches",name:"Biscoito — opção 6",qty:1,price:0,bought:false,note:""}
 ];
-const key="acaoSocialStrogonoffV1";
-const savedListsKey="acaoSocialSavedListsV1";
+const key="acaoSocialCasaV2";
+const savedListsKey="acaoSocialSavedListsCasaV2";
 let state;
 try{state=JSON.parse(localStorage.getItem(key))||null}catch(e){state=null}
 if(!state)state={items:initialItems,budget:450,notes:""};
 const fmt=n=>(Number(n)||0).toLocaleString("pt-BR",{style:"currency",currency:"BRL"});
 function save(){try{localStorage.setItem(key,JSON.stringify(state))}catch(e){} renderStats()}
 function toast(msg){const t=document.getElementById("toast");t.textContent=msg;t.style.display="block";setTimeout(()=>t.style.display="none",2200)}
+
 function render(){
  const root=document.getElementById("items");root.innerHTML="";
+ let currentCategory="";
+ 
  state.items.forEach((it,i)=>{
+  if(it.category !== currentCategory){
+   currentCategory=it.category || "Geral";
+   const catDiv=document.createElement("div");
+   catDiv.className="category-title";
+   catDiv.textContent=currentCategory;
+   root.appendChild(catDiv);
+  }
+
   const el=document.createElement("article");el.className="item"+(it.bought?" done":"");
   el.innerHTML=`<input class="check" type="checkbox" aria-label="Marcar como ignorado" ${it.bought?"checked":""}>
    <div>
@@ -137,9 +200,9 @@ function render(){
  document.getElementById("notes").value=state.notes||"";
  renderStats();
 }
+
 function renderStats(){
  const itemTotal=x=>(Number(x.qty)||0)*(Number(x.price)||0);
- 
  const activeItems=state.items.filter(x=>!x.bought);
  const total=activeItems.reduce((s,x)=>s+itemTotal(x),0);
  const boughtCount=state.items.filter(x=>x.bought).length;
@@ -149,7 +212,13 @@ function renderStats(){
  document.getElementById("balance").textContent=fmt((Number(state.budget)||0)-total);
  document.getElementById("progress").style.width=(state.items.length?((state.items.length - boughtCount)/state.items.length)*100:0)+"%";
 }
-document.getElementById("add").addEventListener("click",()=>{state.items.push({name:"Novo ingrediente",qty:1,price:0,bought:false,note:""});save();render();toast("Item adicionado")});
+
+document.getElementById("add").addEventListener("click",()=>{
+ const catName=prompt("Nome da sessão/categoria para este item:", "🍚 Mercearia");
+ if(catName===null)return;
+ state.items.push({category:catName.trim()||"Geral",name:"Novo item",qty:1,price:0,bought:false,note:""});
+ save();render();toast("Item adicionado");
+});
 document.getElementById("budget").addEventListener("input",e=>{state.budget=Number(e.target.value)||0;save()});
 document.getElementById("notes").addEventListener("input",e=>{state.notes=e.target.value;save()});
 
@@ -158,46 +227,47 @@ function getSavedLists(){
 }
 document.getElementById("saveList").addEventListener("click",()=>{
   const defaultName="Lista de compras";
-  const name=prompt("Dê um nome para esta lista (ex.: Ação social de dezembro):",defaultName);
+  const name=prompt("Dê um nome para esta lista:",defaultName);
   if(name===null)return;
-  const cleanName=name.name?name.name.trim():name.trim();
+  const cleanName=name.trim();
   if(!cleanName){toast("Digite um nome para salvar a lista");return}
   const lists=getSavedLists();
   const existing=lists.findIndex(x=>x.name.toLowerCase()===cleanName.toLowerCase());
   const snapshot={name:cleanName,savedAt:new Date().toISOString(),items:JSON.parse(JSON.stringify(state.items)),budget:Number(state.budget)||0,notes:state.notes||""};
   if(existing>=0){
-    if(!confirm("Já existe uma lista com esse nome. Deseja substituir a versão salva?"))return;
+    if(!confirm("Já existe uma lista com esse nome. Deseja substituir?"))return;
     lists[existing]=snapshot;
   }else{
     lists.push(snapshot);
   }
-  try{localStorage.setItem(savedListsKey,JSON.stringify(lists));toast("Lista salva para reutilizar!")}
-  catch(e){toast("Não foi possível salvar. Verifique o espaço disponível no navegador.")}
+  try{localStorage.setItem(savedListsKey,JSON.stringify(lists));toast("Lista salva!")}
+  catch(e){toast("Erro ao salvar no navegador.")}
 });
 document.getElementById("loadList").addEventListener("click",()=>{
   const lists=getSavedLists();
-  if(!lists.length){toast("Você ainda não tem listas salvas");return}
+  if(!lists.length){toast("Você não tem listas salvas");return}
   const menu=lists.map((x,i)=>`${i+1}. ${x.name}`).join("\n");
-  const answer=prompt("Digite o número da lista que deseja reutilizar:\n\n"+menu);
+  const answer=prompt("Digite o número da lista:\n\n"+menu);
   if(answer===null)return;
   const index=Number(answer)-1;
-  if(!Number.isInteger(index)||index<0||index>=lists.length){toast("Número de lista inválido");return}
-  if(!confirm("Carregar esta lista substituirá a lista atual na tela. Deseja continuar?"))return;
+  if(!Number.isInteger(index)||index<0||index>=lists.length){toast("Número inválido");return}
+  if(!confirm("Carregar esta lista substituirá a atual. Continuar?"))return;
   const chosen=lists[index];
   state={items:JSON.parse(JSON.stringify(chosen.items||[])),budget:Number(chosen.budget)||0,notes:chosen.notes||""};
-  save();render();toast("Lista reutilizada com sucesso!");
+  save();render();toast("Lista carregada!");
 });
 
-document.getElementById("reset").addEventListener("click",()=>{if(confirm("Restaurar a lista original? Suas alterações atuais serão substituídas.")){state={items:JSON.parse(JSON.stringify(initialItems)),budget:450,notes:""};save();render();toast("Lista restaurada")}});
+document.getElementById("reset").addEventListener("click",()=>{if(confirm("Restaurar lista original?")){state={items:JSON.parse(JSON.stringify(initialItems)),budget:450,notes:""};save();render();toast("Restaurado")}});
 document.getElementById("export").addEventListener("click",()=>{
- const lines=["CHECKLIST — AÇÃO SOCIAL (50 pessoas)",""];
+ const lines=["CHECKLIST — LISTA DE COMPRAS",""];
  const itemTotal=x=>(Number(x.qty)||0)*(Number(x.price)||0);
- state.items.forEach(it=>lines.push(`${it.bought?"[ignorado]":"[ativo]"} ${it.name} | Quantidade: ${it.qty} | Valor unitário: ${fmt(it.price)} | Total: ${fmt(itemTotal(it))}`));
- lines.push("",`Total previsto (ativos): ${fmt(state.items.filter(x=>!x.bought).reduce((s,x)=>s+itemTotal(x),0))}`,`Orçamento: ${fmt(state.budget)}`,"","Observações:",state.notes||"—");
- const blob=new Blob([lines.join("\n")],{type:"text/plain;charset=utf-8"});const url=URL.createObjectURL(blob);const a=document.createElement("a");a.href=url;a.download="checklist-acao-social.txt";a.click();URL.revokeObjectURL(url);toast("Lista exportada");
+ state.items.forEach(it=>lines.push(`[${it.category}] ${it.bought?"[ignorado]":"[ativo]"} ${it.name} | Qtd: ${it.qty} | Unit: ${fmt(it.price)} | Total: ${fmt(itemTotal(it))}`));
+ lines.push("",`Total previsto: ${fmt(state.items.filter(x=>!x.bought).reduce((s,x)=>s+itemTotal(x),0))}`,`Orçamento: ${fmt(state.budget)}`,"","Observações:",state.notes||"—");
+ const blob=new Blob([lines.join("\n")],{type:"text/plain;charset=utf-8"});const url=URL.createObjectURL(blob);const a=document.createElement("a");a.href=url;a.download="lista-compras.txt";a.click();URL.revokeObjectURL(url);toast("Exportado");
 });
 render();
 </script>
 </body>
 </html>
+
 
